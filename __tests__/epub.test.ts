@@ -1,8 +1,8 @@
-import { vi, describe, it, expect } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 vi.useFakeTimers().setSystemTime(new Date('2023-06-03 00:00:00'));
 
-const Epub = (await import('../lib/epub.js')).default;
+const Epub = (await import('../src/epub')).default;
 
 describe('epub', () => {
   const sections = [
@@ -255,5 +255,21 @@ body { margin: 5px; }`,
     expect(
       files.filter(({ folder }) => folder === 'OPS/resources').length,
     ).toBe(1);
+  });
+
+  it('Uses the XHTML Doctype', () => {
+    const epub = new Epub({
+      css,
+      metadata,
+      resources,
+      sections,
+    });
+    const files = epub.getFiles();
+    const cover = files.find(
+      (file) => file.folder === 'OPS' && file.name === 'cover.xhtml',
+    );
+    expect(cover?.content).toContain(
+      '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">',
+    );
   });
 });

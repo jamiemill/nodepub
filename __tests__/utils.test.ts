@@ -1,4 +1,4 @@
-import { vi, describe, it, expect, beforeEach, Mock } from 'vitest';
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
 vi.mock('node:fs/promises', () => ({
   mkdir: vi.fn(),
@@ -6,7 +6,7 @@ vi.mock('node:fs/promises', () => ({
 
 const { mkdir } = await import('node:fs/promises');
 
-const { addResourceDetails, makeFolder } = await import('../lib/utils.js');
+const { addResourceDetails, makeFolder } = await import('../src/utils');
 
 describe('utils', () => {
   describe('addResourceDetails', () => {
