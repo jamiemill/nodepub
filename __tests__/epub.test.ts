@@ -1,6 +1,6 @@
-import { jest } from '@jest/globals';
+import { vi, describe, it, expect } from 'vitest';
 
-jest.useFakeTimers().setSystemTime(new Date('2023-06-03 00:00:00'));
+vi.useFakeTimers().setSystemTime(new Date('2023-06-03 00:00:00'));
 
 const Epub = (await import('../lib/epub.js')).default;
 

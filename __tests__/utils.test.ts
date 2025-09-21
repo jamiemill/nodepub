@@ -1,7 +1,7 @@
-import { jest } from '@jest/globals';
+import { vi, describe, it, expect, beforeEach, Mock } from 'vitest';
 
-jest.unstable_mockModule('node:fs/promises', () => ({
-  mkdir: jest.fn(),
+vi.mock('node:fs/promises', () => ({
+  mkdir: vi.fn(),
 }));
 
 const { mkdir } = await import('node:fs/promises');
@@ -36,18 +36,18 @@ describe('utils', () => {
 
   describe('makeFolder', () => {
     beforeEach(() => {
-      (mkdir as jest.Mock).mockClear();
+      (mkdir as Mock).mockClear();
     });
 
     it('Works', async () => {
-      (mkdir as jest.Mock).mockImplementationOnce(() => Promise.resolve(0));
+      (mkdir as Mock).mockImplementationOnce(() => Promise.resolve(0));
       await makeFolder('folder');
       expect(mkdir).toBeCalledWith('folder');
     });
 
     it('Throws Error', async () => {
       const err = new Error('Bad Folder');
-      (mkdir as jest.Mock).mockImplementationOnce(() => Promise.reject(err));
+      (mkdir as Mock).mockImplementationOnce(() => Promise.reject(err));
       try {
         await makeFolder('folder');
       } catch (e) {
@@ -60,7 +60,7 @@ describe('utils', () => {
       // Node doesn't expose SystemError
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (err as any).code = 'EEXIST';
-      (mkdir as jest.Mock).mockImplementationOnce(() => Promise.reject(err));
+      (mkdir as Mock).mockImplementationOnce(() => Promise.reject(err));
       try {
         await makeFolder('folder');
         expect(mkdir).toBeCalledWith('folder');
