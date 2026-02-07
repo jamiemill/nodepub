@@ -257,7 +257,7 @@ body { margin: 5px; }`,
     ).toBe(1);
   });
 
-  it('Uses the XHTML Doctype', () => {
+  it('Uses the HTML5 Doctype', () => {
     const epub = new Epub({
       css,
       metadata,
@@ -268,8 +268,6 @@ body { margin: 5px; }`,
     const cover = files.find(
       (file) => file.folder === 'OPS' && file.name === 'cover.xhtml',
     );
-    expect(cover?.content).toContain(
-      '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">',
-    );
+    expect(cover?.content).toContain('<!DOCTYPE html>');
   });
 });
