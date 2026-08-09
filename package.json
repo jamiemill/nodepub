@@ -52,6 +52,7 @@
   ],
   "license": "MIT",
   "name": "@dylanarmstrong/nodepub",
+  "packageManager": "pnpm@8.15.9",
   "prettier": {
     "singleQuote": true,
     "trailingComma": "all"
@@ -70,7 +71,8 @@
     "lint:src": "eslint src/ --fix",
     "lint:test": "eslint __tests__/ --fix",
     "prettier": "prettier --write --ignore-unknown src/ __tests__/ example/example.ts",
-    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js"
+    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
+    "validate": "pnpm run build && node scripts/validate-fixtures.mjs"
   },
   "type": "module",
   "version": "4.1.5"
