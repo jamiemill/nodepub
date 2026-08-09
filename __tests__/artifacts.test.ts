@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { open, type Entry, type ZipFile } from 'yauzl';
@@ -322,5 +322,16 @@ describe('generated EPUB artifacts', () => {
           sections: baseSections,
         }),
     ).not.toThrow();
+  });
+
+  it('rejects write when the output stream fails', async () => {
+    const epub = new Epub({
+      metadata: baseMetadata,
+      options: { coverType: 'text' },
+      sections: baseSections,
+    });
+    await mkdir(join(outputFolder, 'not-a-file.epub'));
+
+    await expect(epub.write(outputFolder, 'not-a-file')).rejects.toThrow();
   });
 });

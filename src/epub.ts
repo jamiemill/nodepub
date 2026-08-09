@@ -1,6 +1,8 @@
 import defaults from 'defaults';
 import zip from 'archiver';
 import { createWriteStream } from 'node:fs';
+import { unlink } from 'node:fs/promises';
+import { join } from 'node:path';
 
 import type { Data, Document, Metadata, Section } from './types.js';
 import {
@@ -193,38 +195,52 @@ class Epub {
     const fullFilename = filename.endsWith('.epub')
       ? filename
       : `${filename}.epub`;
+    const outputPath = join(folder, fullFilename);
 
     // Start creating the zip.
     await makeFolder(folder);
-    const output = createWriteStream(`${folder}/${fullFilename}`);
+    const output = createWriteStream(outputPath);
     const archive = zip('zip', { store: false });
-    archive.on('error', (archiveErr) => {
-      throw archiveErr;
-    });
 
-    await new Promise<void>((resolveWrite) => {
-      // Wait for file descriptor to be written.
-      archive.pipe(output);
-      output.on('close', () => resolveWrite());
+    try {
+      await new Promise<void>((resolveWrite, rejectWrite) => {
+        let settled = false;
+        const settle = (callback: () => void) => {
+          if (!settled) {
+            settled = true;
+            callback();
+          }
+        };
+        const rejectOnce = (error: Error) =>
+          settle(() => rejectWrite(error));
 
-      // Write the file contents.
-      files.forEach((file) => {
-        if (file.folder.length > 0) {
-          archive.append(file.content, {
-            name: `${file.folder}/${file.name}`,
-            store: !file.compress,
-          });
-        } else {
-          archive.append(file.content, {
-            name: file.name,
-            store: !file.compress,
-          });
-        }
+        archive.once('error', rejectOnce);
+        output.once('error', rejectOnce);
+        output.once('close', () => settle(resolveWrite));
+        archive.pipe(output);
+
+        files.forEach((file) => {
+          if (file.folder.length > 0) {
+            archive.append(file.content, {
+              name: `${file.folder}/${file.name}`,
+              store: !file.compress,
+            });
+          } else {
+            archive.append(file.content, {
+              name: file.name,
+              store: !file.compress,
+            });
+          }
+        });
+
+        void archive.finalize().catch(rejectOnce);
       });
-
-      // Done.
-      archive.finalize();
-    });
+    } catch (error) {
+      archive.abort();
+      output.destroy();
+      await unlink(outputPath).catch(() => undefined);
+      throw error;
+    }
   }
 }
 
