@@ -364,8 +364,41 @@ body { margin: 5px; }`,
 
     expect(opf).toContain('<dc:title id="title">Exact title</dc:title>');
     expect(opf).not.toContain('Exact title (Example series #2)');
+    expect(opf).toContain(
+      '<meta id="series" property="belongs-to-collection">Example series</meta>',
+    );
+    expect(opf).toContain(
+      '<meta property="collection-type" refines="#series">series</meta>',
+    );
+    expect(opf).toContain(
+      '<meta property="group-position" refines="#series">2</meta>',
+    );
     expect(opf).toContain('content="Example series"');
     expect(opf).toContain('content="2"');
+  });
+
+  it('serializes a series without requiring a group position', () => {
+    const epub = new Epub({
+      metadata: {
+        ...metadata,
+        sequence: 0,
+        series: 'Unnumbered series',
+      },
+      sections,
+    });
+    const opf = epub
+      .getFiles()
+      .find(({ name }) => name === 'ebook.opf')
+      ?.content.toString();
+
+    expect(opf).toContain(
+      '<meta id="series" property="belongs-to-collection">Unnumbered series</meta>',
+    );
+    expect(opf).toContain(
+      '<meta property="collection-type" refines="#series">series</meta>',
+    );
+    expect(opf).not.toContain('property="group-position"');
+    expect(opf).not.toContain('name="calibre:series"');
   });
 
   it('rejects resource basenames that collide inside the archive', () => {

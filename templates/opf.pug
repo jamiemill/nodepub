@@ -107,6 +107,22 @@ package(
     each tag in data.metadata.tags
       dc:subject=tag
 
+    if data.metadata.series
+      meta(
+        id='series',
+        property='belongs-to-collection'
+      )=data.metadata.series
+      meta(
+        property='collection-type',
+        refines='#series'
+      )='series'
+
+      if data.metadata.sequence
+        meta(
+          property='group-position',
+          refines='#series'
+        )=data.metadata.sequence
+
     if data.metadata.series && data.metadata.sequence
       meta(
         content=data.metadata.series,
