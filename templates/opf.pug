@@ -29,25 +29,9 @@ package(
   metadata(
     xmlns:dc='http://purl.org/dc/elements/1.1/'
   )
-    if data.metadata.series && data.metadata.sequence
-      dc:title(
-        id='title'
-      ) #{data.metadata.title} (#{data.metadata.series} ##{data.metadata.sequence})
-
-    else if data.metadata.series
-      dc:title(
-        id='title'
-      ) #{data.metadata.title} (#{data.metadata.series})
-
-    else if data.metadata.sequence
-      dc:title(
-        id='title'
-      ) #{data.metadata.title} (##{data.metadata.sequence})
-
-    else
-      dc:title(
-        id='title'
-      ) #{data.metadata.title}
+    dc:title(
+      id='title'
+    )=data.metadata.title
 
     meta(
       property='title-type',

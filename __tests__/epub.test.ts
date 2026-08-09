@@ -261,4 +261,14 @@ body { margin: 5px; }`,
       files.filter(({ folder }) => folder === 'OPS/resources').length,
     ).toBe(1);
   });
+
+  it('zero-pads the default publication date', () => {
+    const { published: _published, ...metadataWithoutPublished } = metadata;
+    const epub = new Epub({
+      metadata: metadataWithoutPublished,
+      sections,
+    });
+
+    expect(epub.data.metadata.published).toBe('2023-06-03');
+  });
 });

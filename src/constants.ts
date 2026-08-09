@@ -8,9 +8,7 @@ const defaultOptions: ResolvedOptions = {
 };
 
 const date = new Date();
-const published = `${date.getFullYear()}-${
-  date.getMonth() + 1
-}-${date.getDate()}`;
+const published = date.toISOString().slice(0, 10);
 const modified = date.toISOString().replace(/\.[0-9]{3}Z/, 'Z');
 
 const defaultMetadata: Required<Metadata> = {

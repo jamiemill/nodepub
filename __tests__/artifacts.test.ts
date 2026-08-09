@@ -245,6 +245,27 @@ describe('generated EPUB artifacts', () => {
     );
   });
 
+  it('preserves the exact title when series metadata is present', () => {
+    const epub = new Epub({
+      metadata: {
+        ...baseMetadata,
+        sequence: 2,
+        series: 'Example series',
+        title: 'Exact title',
+      },
+      options: { coverType: 'text' },
+      sections: baseSections,
+    });
+    const opf = epub
+      .getFiles()
+      .find(({ name }) => name === 'ebook.opf')?.content.toString();
+
+    expect(opf).toContain('<dc:title id="title">Exact title</dc:title>');
+    expect(opf).not.toContain('Exact title (Example series #2)');
+    expect(opf).toContain('content="Example series"');
+    expect(opf).toContain('content="2"');
+  });
+
   it('rejects resource basenames that collide inside the archive', () => {
     expect(
       () =>
