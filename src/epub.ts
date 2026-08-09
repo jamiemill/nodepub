@@ -2,7 +2,7 @@ import defaults from 'defaults';
 import zip from 'archiver';
 import { createWriteStream } from 'node:fs';
 
-import type { Data, Document, Metadata, Options, Section } from './types.js';
+import type { Data, Document, Metadata, Section } from './types.js';
 import {
   defaultCss,
   defaultMetadata,
@@ -38,10 +38,13 @@ class Epub {
       metadata.cover.data = partialMetadata.cover.data;
     }
 
-    const options: Required<Options> = defaults(
-      partialOptions,
-      defaultOptions,
-    );
+    const options = {
+      coverType: partialOptions.coverType ?? defaultOptions.coverType,
+      showContentsInSpine:
+        partialOptions.showContentsInSpine ??
+        partialOptions.showContents ??
+        defaultOptions.showContentsInSpine,
+    };
 
     const sections: Required<Section>[] = [];
     partialSections.forEach((section, index) => {
@@ -136,15 +139,14 @@ class Epub {
       });
     }
 
-    // Table of contents markup.
-    if (data.options.showContents) {
-      files.push({
-        compress: true,
-        content: getContents(data),
-        folder: 'OPS/content',
-        name: 'toc.xhtml',
-      });
-    }
+    // EPUB 3 always requires a navigation document. The option only controls
+    // whether that document is also visible in the reading-order spine.
+    files.push({
+      compress: true,
+      content: getContents(data),
+      folder: 'OPS/content',
+      name: 'toc.xhtml',
+    });
 
     data.resources.forEach((resource) => {
       files.push({

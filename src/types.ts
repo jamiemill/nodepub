@@ -48,14 +48,21 @@ type Metadata = BaseMetadata &
 
 type Options = Partial<{
   coverType: CoverType;
+  /** @deprecated Use showContentsInSpine instead. */
   showContents: boolean;
+  showContentsInSpine: boolean;
 }>;
+
+type ResolvedOptions = {
+  coverType: CoverType;
+  showContentsInSpine: boolean;
+};
 
 type Data = {
   cover: string | Required<Resource>;
   css: string;
   metadata: Required<Metadata>;
-  options: Required<Options>;
+  options: ResolvedOptions;
   resources: Required<Resource>[];
   sections: Required<Section>[];
 };
@@ -69,4 +76,13 @@ type Document = {
   resources: Resource[];
 }>;
 
-export type { CoverType, Data, Document, Metadata, Options, Resource, Section };
+export type {
+  CoverType,
+  Data,
+  Document,
+  Metadata,
+  Options,
+  ResolvedOptions,
+  Resource,
+  Section,
+};

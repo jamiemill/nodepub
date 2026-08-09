@@ -1,5 +1,8 @@
 doctype xml
+| <!DOCTYPE html>
 html(
+  lang=data.metadata.language,
+  xml:lang=data.metadata.language,
   xmlns:epub='http://www.idpf.org/2007/ops',
   xmlns='http://www.w3.org/1999/xhtml'
 )
@@ -17,7 +20,7 @@ html(
   body
     section(
       class='frontmatter'
-      epub:type='frontmatter toc'
+      epub:type='frontmatter'
     )
       header
         h1= data.metadata.contents
@@ -25,6 +28,7 @@ html(
       nav(
         epub:type='toc',
         id='toc',
+        role='doc-toc',
         xmlns:epub='http://www.idpf.org/2007/ops'
       )
         ol

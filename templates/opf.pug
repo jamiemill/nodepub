@@ -15,7 +15,7 @@ mixin resources(resources)
       )
 
 -
-  let showContents =data.options.showContents;
+  let showContentsInSpine = data.options.showContentsInSpine;
   let sections =data.sections;
 
 doctype xml
@@ -154,7 +154,7 @@ package(
           idref=`s${section.index}`
         )
 
-    if showContents
+    if showContentsInSpine
       itemref(
         idref='toc'
       )
@@ -165,7 +165,7 @@ package(
           idref=`s${section.index}`
         )
 
-  if showContents
+  if showContentsInSpine
     guide
       reference(
         href='content/toc.xhtml',

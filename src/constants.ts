@@ -1,10 +1,10 @@
 import { v4 as uuid } from 'uuid';
 
-import type { Options, Metadata, Section } from './types.js';
+import type { Metadata, ResolvedOptions, Section } from './types.js';
 
-const defaultOptions: Required<Options> = {
+const defaultOptions: ResolvedOptions = {
   coverType: 'image',
-  showContents: true,
+  showContentsInSpine: true,
 };
 
 const date = new Date();

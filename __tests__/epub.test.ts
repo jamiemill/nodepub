@@ -109,7 +109,7 @@ body { margin: 5px; }`,
       },
       options: {
         coverType: 'image',
-        showContents: true,
+        showContentsInSpine: true,
       },
       resources: [
         {
