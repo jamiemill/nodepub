@@ -1,6 +1,6 @@
 import { jest } from '@jest/globals';
 
-jest.useFakeTimers().setSystemTime(new Date('2023-06-03 00:00:00'));
+jest.useFakeTimers().setSystemTime(new Date('2023-06-03T00:00:00Z'));
 
 const Epub = (await import('../src/epub.js')).default;
 
@@ -98,7 +98,7 @@ body { margin: 5px; }`,
         genre: 'Non-Fiction',
         id: '1234',
         language: 'en',
-        modified: '2023-06-02T22:00:00Z',
+        modified: '2023-06-03T00:00:00Z',
         published: '1992-06-17',
         publisher: 'My Fake Publisher',
         sequence: 1,
