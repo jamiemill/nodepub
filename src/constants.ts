@@ -21,6 +21,7 @@ const defaultMetadata: Required<Metadata> = {
   contents: 'Table of Contents',
   copyright: '',
   cover: 'Cover',
+  coverAlt: '',
   description: '',
   fileAs: '',
   genre: '',

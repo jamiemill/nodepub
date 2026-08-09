@@ -79,6 +79,7 @@ const metadata = {
     data: await readFile('example/cover.png'),
     name: 'cover.png',
   },
+  coverAlt: 'Cover of My First Book by Dylan',
   description: 'A test book.',
   fileAs: 'Dylan',
   genre: 'Non-Fiction',
@@ -150,6 +151,7 @@ const epub = new Epub({
 ### Regarding Metadata
 
 - `cover` is either an image `Resource` or prevalidated XHTML content for a text cover
+- `coverAlt` sets image-cover alternative text; use `''` only when the cover is intentionally decorative
 - `fileAs` is the sortable version of the `author`, which is usually by last name
 - `genre` becomes the main subject in the final Epub
 - `language` is the short _ISO_ language name (`en`, `fr`, `de` etc)
@@ -171,6 +173,10 @@ Nodepub serializes these values but does not infer them. The caller is
 responsible for ensuring that every claim is true for the complete publication.
 An Ace pass is not a certification, and nodepub never emits conformance or
 certification claims automatically.
+
+When an image cover omits `coverAlt`, nodepub uses `Cover of {title}` as a
+backward-compatible fallback. Callers should normally provide a more useful
+value. `coverAlt` is XML-escaped during serialization.
 
 ### Regarding Sections
 

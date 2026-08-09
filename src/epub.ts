@@ -61,6 +61,9 @@ class Epub {
     ) {
       metadata.cover.data = partialMetadata.cover.data;
     }
+    metadata.coverAlt =
+      partialMetadata.coverAlt ??
+      (metadata.title ? `Cover of ${metadata.title}` : 'Cover');
 
     const options = {
       coverType: partialOptions.coverType ?? defaultOptions.coverType,

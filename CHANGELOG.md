@@ -6,6 +6,7 @@
 - Add `showContentsInSpine`; retain `showContents` as a deprecated compatibility alias.
 - Add `lang`, `xml:lang`, HTML5 doctypes, and `role="doc-toc"` to generated XHTML/navigation.
 - Add caller-controlled accessibility discovery metadata fields.
+- Add caller-controlled image-cover alternative text, including an explicit decorative empty-string value.
 - Reject resource archive-path collisions, unknown media types, and unsafe section filenames.
 - Accept section filename stems or complete `.xhtml` filenames.
 - Make archive and output errors reject `write()` and clean up partial files when possible.

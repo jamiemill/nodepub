@@ -37,6 +37,7 @@ type Metadata = BaseMetadata &
     accessibilityHazard: string[];
     accessibilitySummary: string;
     contents: string;
+    coverAlt: string;
     copyright: string;
     description: string;
     fileAs: string;

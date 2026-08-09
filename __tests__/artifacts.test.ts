@@ -117,6 +117,7 @@ describe('generated EPUB artifacts', () => {
       metadata: {
         ...baseMetadata,
         cover: { data: cover, name: 'cover.png' },
+        coverAlt: 'Cover of Example & Book',
       },
       resources: [{ data: bodyImage, name: 'body.png' }],
       sections: [
@@ -134,9 +135,35 @@ describe('generated EPUB artifacts', () => {
 
     expect(byName.get('OPS/resources/cover.png')?.content).toEqual(cover);
     expect(byName.get('OPS/resources/body.png')?.content).toEqual(bodyImage);
+    expect(byName.get('OPS/cover.xhtml')?.content.toString()).toContain(
+      'alt="Cover of Example &amp; Book"',
+    );
     expect(byName.get('OPS/ebook.opf')?.content.toString()).toContain(
       'media-type="image/png"',
     );
+  });
+
+  it('supports default, explicit, and decorative cover alternative text', () => {
+    const getCover = (coverAlt?: string) => {
+      const epub = new Epub({
+        metadata: {
+          ...baseMetadata,
+          cover: { data: Buffer.from('cover'), name: 'cover.png' },
+          ...(coverAlt === undefined ? {} : { coverAlt }),
+        },
+        sections: baseSections,
+      });
+      return epub
+        .getFiles()
+        .find(({ name }) => name === 'cover.xhtml')
+        ?.content.toString();
+    };
+
+    expect(getCover()).toContain('alt="Cover of Example Book"');
+    expect(getCover('Front cover artwork')).toContain(
+      'alt="Front cover artwork"',
+    );
+    expect(getCover('')).toContain('alt=""');
   });
 
   it('keeps front matter and excluded entries out of logical navigation', () => {

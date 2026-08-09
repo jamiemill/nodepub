@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { access, mkdtemp, rm } from 'node:fs/promises';
+import { access, mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -82,6 +82,10 @@ const sections = [
 ];
 
 try {
+  const [coverData, bodyImageData] = await Promise.all([
+    readFile(join(projectRoot, 'example/cover.png')),
+    readFile(join(projectRoot, 'example/hat.png')),
+  ]);
   const fixtures = [
     {
       filename: 'minimal.epub',
@@ -100,13 +104,35 @@ try {
       },
       options: { coverType: 'text', showContentsInSpine: true },
     },
+    {
+      filename: 'images.epub',
+      metadata: {
+        ...metadata,
+        accessMode: ['textual', 'visual'],
+        accessibilityFeature: ['structuralNavigation', 'alternativeText'],
+        accessibilitySummary:
+          'This publication includes structural navigation and text alternatives for its images.',
+        cover: { data: coverData, name: 'cover.png' },
+        coverAlt: 'Cover of Validation fixture by Example Author',
+      },
+      options: { coverType: 'image', showContentsInSpine: true },
+      resources: [{ data: bodyImageData, name: 'hat.png' }],
+      sections: [
+        {
+          content:
+            '<h1>Illustrated chapter</h1><p><img src="../resources/hat.png" alt="A black top hat." /></p>',
+          title: 'Illustrated chapter',
+        },
+      ],
+    },
   ];
 
   for (const fixture of fixtures) {
     const epub = new Epub({
       metadata: fixture.metadata || metadata,
       options: fixture.options,
-      sections,
+      resources: fixture.resources || [],
+      sections: fixture.sections || sections,
     });
     await epub.write(outputFolder, fixture.filename);
     run(
@@ -116,7 +142,11 @@ try {
     );
   }
 
-  for (const filename of ['minimal.epub', 'accessibility-metadata.epub']) {
+  for (const filename of [
+    'minimal.epub',
+    'accessibility-metadata.epub',
+    'images.epub',
+  ]) {
     run(
       aceBin,
       [

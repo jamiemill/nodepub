@@ -41,7 +41,7 @@ html(
   body
     if coverType === 'image'
       img(
-        alt='Cover',
+        alt=data.metadata.coverAlt,
         src=`resources/${data.cover.base}`,
         style='height: 100%; width: 100%;'
       )
