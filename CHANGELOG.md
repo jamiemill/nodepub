@@ -11,6 +11,7 @@
 - Accept section filename stems or complete `.xhtml` filenames.
 - Make archive and output errors reject `write()` and clean up partial files when possible.
 - Preserve the caller's exact title and zero-pad generated publication dates.
+- Emit EPUB 3 series and group-position metadata while retaining Calibre compatibility metadata.
 - Pin artifact validation to EPUBCheck 5.3.0 and Ace 1.4.6 in CI.
 - Restore pnpm and externally packaged Pug templates by rebuilding on `@dylanarmstrong/nodepub` 4.1.5.
 - Restore a pnpm-based clean `prepare` build so Git dependencies contain compiled output without stale files.

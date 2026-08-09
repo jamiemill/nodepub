@@ -42,8 +42,6 @@ CI runs against Node 22. Node 18 or later is supported.
 
 This fork continues [Dylan Armstrong's EPUB 3.3 rewrite](https://github.com/dylanarmstrong/nodepub),
 which in turn continues [kcartlidge/nodepub](https://github.com/kcartlidge/nodepub).
-The fork audit and adoption decisions are recorded in
-[`docs/fork-audit.md`](./docs/fork-audit.md).
 
 ## Installation
 
@@ -156,7 +154,7 @@ const epub = new Epub({
 - `genre` becomes the main subject in the final Epub
 - `language` is the short _ISO_ language name (`en`, `fr`, `de` etc)
 - `published` is the publication date in _year-month-day_ format
-- `series` and `sequence` are not recognised by many readers (it sets the properties used by _Calibre_)
+- `series` emits EPUB 3 collection metadata; a non-zero `sequence` adds the group position, with Calibre metadata retained for compatibility
 - `tags` also become subjects in the final Epub
 
 Accessibility discovery metadata is optional and caller-controlled:
