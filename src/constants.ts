@@ -14,6 +14,11 @@ const published = `${date.getFullYear()}-${
 const modified = date.toISOString().replace(/\.[0-9]{3}Z/, 'Z');
 
 const defaultMetadata: Required<Metadata> = {
+  accessMode: [],
+  accessModeSufficient: [],
+  accessibilityFeature: [],
+  accessibilityHazard: [],
+  accessibilitySummary: '',
   author: '',
   contents: 'Table of Contents',
   copyright: '',

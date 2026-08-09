@@ -86,6 +86,11 @@ describe('epub', () => {
 
 body { margin: 5px; }`,
       metadata: {
+        accessMode: [],
+        accessModeSufficient: [],
+        accessibilityFeature: [],
+        accessibilityHazard: [],
+        accessibilitySummary: '',
         author: 'Dylan',
         contents: 'Chapters',
         copyright: 'Dylan, 2023',

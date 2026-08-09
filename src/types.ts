@@ -31,6 +31,11 @@ type BaseMetadata = {
 
 type Metadata = BaseMetadata &
   Partial<{
+    accessMode: string[];
+    accessModeSufficient: string[];
+    accessibilityFeature: string[];
+    accessibilityHazard: string[];
+    accessibilitySummary: string;
     contents: string;
     copyright: string;
     description: string;

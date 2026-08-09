@@ -54,6 +54,31 @@ package(
       refines='#title'
     )='main'
 
+    each accessMode in data.metadata.accessMode
+      meta(
+        property='schema:accessMode'
+      )=accessMode
+
+    each accessModeSufficient in data.metadata.accessModeSufficient
+      meta(
+        property='schema:accessModeSufficient'
+      )=accessModeSufficient
+
+    each accessibilityFeature in data.metadata.accessibilityFeature
+      meta(
+        property='schema:accessibilityFeature'
+      )=accessibilityFeature
+
+    each accessibilityHazard in data.metadata.accessibilityHazard
+      meta(
+        property='schema:accessibilityHazard'
+      )=accessibilityHazard
+
+    if data.metadata.accessibilitySummary
+      meta(
+        property='schema:accessibilitySummary'
+      )=data.metadata.accessibilitySummary
+
     dc:language=data.metadata.language
     dc:identifier(
       id='pub-id'
