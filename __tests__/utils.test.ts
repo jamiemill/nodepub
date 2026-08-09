@@ -18,7 +18,6 @@ describe('utils', () => {
       ['folder/image.svg', 'image/svg+xml'],
       ['folder/image.tif', 'image/tiff'],
       ['folder/image.tiff', 'image/tiff'],
-      ['folder/some-file', ''],
     ];
 
     const data = Buffer.from([0]);
@@ -32,6 +31,12 @@ describe('utils', () => {
         type: exp,
       }),
     );
+
+    it('Throws when no media type can be inferred', () => {
+      expect(() =>
+        addResourceDetails({ data, name: 'folder/some-file' }),
+      ).toThrow(/media type/);
+    });
   });
 
   describe('makeFolder', () => {

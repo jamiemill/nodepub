@@ -16,7 +16,28 @@ import {
   getOPF,
   getSection,
 } from './pug.js';
-import { addResourceDetails, makeFolder, uniqueResources } from './utils.js';
+import {
+  addResourceDetails,
+  assertUniqueResourceBases,
+  makeFolder,
+  uniqueResources,
+} from './utils.js';
+
+const normalizeSectionFilename = (filename: string, fallback: string) => {
+  const source = filename || fallback;
+  if (
+    source === '.' ||
+    source === '..' ||
+    source.includes('/') ||
+    source.includes('\\')
+  ) {
+    throw new Error(`Invalid section filename: "${source}"`);
+  }
+
+  return source.toLowerCase().endsWith('.xhtml')
+    ? source
+    : `${source}.xhtml`;
+};
 
 class Epub {
   data: Data;
@@ -54,7 +75,10 @@ class Epub {
       );
 
       const sectionIndex = index + 1;
-      const filename = `${section.filename || `s${sectionIndex}`}.xhtml`;
+      const filename = normalizeSectionFilename(
+        section.filename || '',
+        `s${sectionIndex}`,
+      );
 
       requiredSection.index = sectionIndex;
       requiredSection.filename = filename;
@@ -71,15 +95,17 @@ class Epub {
         ? cover
         : addResourceDetails({ ...cover, properties: 'cover-image' });
     const initialResources = typeof dataCover === 'string' ? [] : [dataCover];
+    const detailedResources = resources
+      .reduce(uniqueResources, initialResources)
+      .map(addResourceDetails);
+    assertUniqueResourceBases(detailedResources);
 
     this.data = {
       cover: dataCover,
       css,
       metadata,
       options,
-      resources: resources
-        .reduce(uniqueResources, initialResources)
-        .map(addResourceDetails),
+      resources: detailedResources,
       sections,
     };
   }

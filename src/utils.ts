@@ -23,6 +23,24 @@ const uniqueResources = (acc: Resource[], cur: Resource) => {
   return acc;
 };
 
+const assertUniqueResourceBases = (resources: Required<Resource>[]) => {
+  const namesByBase = new Map<string, string>();
+
+  resources.forEach(({ base, name }) => {
+    if (!base || basename(base) !== base || base.includes('\\')) {
+      throw new Error(`Invalid resource archive filename: "${base}"`);
+    }
+
+    const previousName = namesByBase.get(base);
+    if (previousName) {
+      throw new Error(
+        `Resource "${base}" archive path collision: "${previousName}" and "${name}"`,
+      );
+    }
+    namesByBase.set(base, name);
+  });
+};
+
 // Checks if a type already has been added manually by user
 const addResourceDetails = (resource: Resource): Required<Resource> => {
   let { data } = resource;
@@ -33,6 +51,12 @@ const addResourceDetails = (resource: Resource): Required<Resource> => {
     type: mime.getType(name) || '',
   });
 
+  if (!requiredResource.type) {
+    throw new Error(
+      `Unable to determine a media type for resource "${name}"; provide type explicitly`,
+    );
+  }
+
   // Overwrite because buffer has become an uint8array
   if (!Buffer.isBuffer(data)) {
     data = Buffer.from(data);
@@ -41,4 +65,9 @@ const addResourceDetails = (resource: Resource): Required<Resource> => {
   return requiredResource;
 };
 
-export { addResourceDetails, makeFolder, uniqueResources };
+export {
+  addResourceDetails,
+  assertUniqueResourceBases,
+  makeFolder,
+  uniqueResources,
+};

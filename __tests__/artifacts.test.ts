@@ -275,4 +275,52 @@ describe('generated EPUB artifacts', () => {
 
     expect(epub.data.sections[0].filename).toBe('chapter.xhtml');
   });
+
+  it.each(['../chapter', 'folder/chapter', '..\\chapter'])(
+    'rejects unsafe section filename %s',
+    (filename) => {
+      expect(
+        () =>
+          new Epub({
+            metadata: baseMetadata,
+            options: { coverType: 'text' },
+            sections: [
+              {
+                content: '<h1>Chapter</h1>',
+                filename,
+                title: 'Chapter',
+              },
+            ],
+          }),
+      ).toThrow(/invalid section filename/i);
+    },
+  );
+
+  it('requires an explicit media type when it cannot be inferred', () => {
+    expect(
+      () =>
+        new Epub({
+          metadata: baseMetadata,
+          options: { coverType: 'text' },
+          resources: [{ data: Buffer.from('data'), name: 'resource.unknown' }],
+          sections: baseSections,
+        }),
+    ).toThrow(/media type.*provide type explicitly/i);
+
+    expect(
+      () =>
+        new Epub({
+          metadata: baseMetadata,
+          options: { coverType: 'text' },
+          resources: [
+            {
+              data: Buffer.from('data'),
+              name: 'resource.unknown',
+              type: 'application/octet-stream',
+            },
+          ],
+          sections: baseSections,
+        }),
+    ).not.toThrow();
+  });
 });
