@@ -264,6 +264,184 @@ body { margin: 5px; }`,
     ).toBe(1);
   });
 
+  it('supports default, explicit, and decorative cover alternative text', () => {
+    const getCover = (coverAlt?: string) => {
+      const epub = new Epub({
+        metadata: { ...metadata, coverAlt },
+        sections,
+      });
+      return epub
+        .getFiles()
+        .find(({ name }) => name === 'cover.xhtml')
+        ?.content.toString();
+    };
+
+    expect(getCover()).toContain('alt="Cover of My First Book"');
+    expect(getCover('Front cover artwork')).toContain(
+      'alt="Front cover artwork"',
+    );
+    expect(getCover('')).toContain('alt=""');
+  });
+
+  it('keeps front matter and excluded entries out of logical navigation', () => {
+    const epub = new Epub({ metadata, sections });
+    const contents = epub
+      .getFiles()
+      .find(({ name }) => name === 'toc.xhtml')
+      ?.content.toString();
+
+    expect(contents).toContain('href="s2.xhtml"');
+    expect(contents).not.toContain('href="title-page.xhtml"');
+    expect(contents).not.toContain('href="s3.xhtml"');
+  });
+
+  it('uses EPUB and HTML language attributes and the matching TOC role', () => {
+    const epub = new Epub({ metadata, sections });
+    const files = epub.getFiles();
+
+    for (const name of ['cover.xhtml', 'toc.xhtml', 'title-page.xhtml']) {
+      const content = files
+        .find((file) => file.name === name)
+        ?.content.toString();
+      expect(content).toContain('lang="en"');
+      expect(content).toContain('xml:lang="en"');
+    }
+
+    const contents = files
+      .find(({ name }) => name === 'toc.xhtml')
+      ?.content.toString();
+    expect(contents).toMatch(/<section[^>]+epub:type="frontmatter"/);
+    expect(contents).toMatch(/<nav[^>]+epub:type="toc"[^>]+role="doc-toc"/);
+  });
+
+  it('serializes caller-supplied accessibility metadata as separate escaped elements', () => {
+    const epub = new Epub({
+      metadata: {
+        ...metadata,
+        accessMode: ['textual', 'visual'],
+        accessModeSufficient: ['textual'],
+        accessibilityFeature: ['structuralNavigation', 'alternativeText'],
+        accessibilityHazard: ['none'],
+        accessibilitySummary: 'Useful & clear <summary>.',
+      },
+      sections,
+    });
+    const opf = epub
+      .getFiles()
+      .find(({ name }) => name === 'ebook.opf')
+      ?.content.toString();
+
+    expect(opf).toContain('<meta property="schema:accessMode">textual</meta>');
+    expect(opf).toContain('<meta property="schema:accessMode">visual</meta>');
+    expect(opf).toContain(
+      '<meta property="schema:accessModeSufficient">textual</meta>',
+    );
+    expect(opf).toContain(
+      '<meta property="schema:accessibilityFeature">structuralNavigation</meta>',
+    );
+    expect(opf).toContain(
+      '<meta property="schema:accessibilityHazard">none</meta>',
+    );
+    expect(opf).toContain(
+      '<meta property="schema:accessibilitySummary">Useful &amp; clear &lt;summary&gt;.</meta>',
+    );
+  });
+
+  it('preserves the exact title when series metadata is present', () => {
+    const epub = new Epub({
+      metadata: {
+        ...metadata,
+        sequence: 2,
+        series: 'Example series',
+        title: 'Exact title',
+      },
+      sections,
+    });
+    const opf = epub
+      .getFiles()
+      .find(({ name }) => name === 'ebook.opf')
+      ?.content.toString();
+
+    expect(opf).toContain('<dc:title id="title">Exact title</dc:title>');
+    expect(opf).not.toContain('Exact title (Example series #2)');
+    expect(opf).toContain('content="Example series"');
+    expect(opf).toContain('content="2"');
+  });
+
+  it('rejects resource basenames that collide inside the archive', () => {
+    expect(
+      () =>
+        new Epub({
+          metadata,
+          resources: [
+            { data: Buffer.from('first'), name: 'a/image.png' },
+            { data: Buffer.from('second'), name: 'b/image.png' },
+          ],
+          sections,
+        }),
+    ).toThrow(/resource.*image\.png.*collision/i);
+  });
+
+  it('accepts a complete XHTML section filename without duplicating the extension', () => {
+    const epub = new Epub({
+      metadata,
+      sections: [
+        {
+          content: '<h1>Chapter</h1>',
+          filename: 'chapter.xhtml',
+          title: 'Chapter',
+        },
+      ],
+    });
+
+    expect(epub.data.sections[0].filename).toBe('chapter.xhtml');
+  });
+
+  it.each(['../chapter', 'folder/chapter', '..\\chapter'])(
+    'rejects unsafe section filename %s',
+    (filename) => {
+      expect(
+        () =>
+          new Epub({
+            metadata,
+            sections: [
+              {
+                content: '<h1>Chapter</h1>',
+                filename,
+                title: 'Chapter',
+              },
+            ],
+          }),
+      ).toThrow(/invalid section filename/i);
+    },
+  );
+
+  it('requires an explicit media type when it cannot be inferred', () => {
+    expect(
+      () =>
+        new Epub({
+          metadata,
+          resources: [{ data: Buffer.from('data'), name: 'resource.unknown' }],
+          sections,
+        }),
+    ).toThrow(/media type.*provide type explicitly/i);
+
+    expect(
+      () =>
+        new Epub({
+          metadata,
+          resources: [
+            {
+              data: Buffer.from('data'),
+              name: 'resource.unknown',
+              type: 'application/octet-stream',
+            },
+          ],
+          sections,
+        }),
+    ).not.toThrow();
+  });
+
   it('zero-pads the default publication date', () => {
     const epub = new Epub({
       metadata: { ...metadata, published: undefined },
