@@ -1,5 +1,4 @@
-import { readFile } from 'node:fs/promises';
-import { mkdir, mkdtemp, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { open, type Entry, type ZipFile } from 'yauzl';
@@ -39,7 +38,7 @@ const readArchive = (filename: string) =>
       zipFile.on('error', reject);
       zipFile.on('end', () => resolve(entries));
       zipFile.on('entry', (entry: Entry) => {
-        void readEntry(zipFile, entry)
+        readEntry(zipFile, entry)
           .then((content) => {
             entries.push({
               compressionMethod: entry.compressionMethod,
@@ -157,7 +156,8 @@ describe('generated EPUB artifacts', () => {
     });
     const contents = epub
       .getFiles()
-      .find(({ name }) => name === 'toc.xhtml')?.content.toString();
+      .find(({ name }) => name === 'toc.xhtml')
+      ?.content.toString();
 
     expect(contents).toContain('href="s2.xhtml"');
     expect(contents).not.toContain('href="title-page.xhtml"');
@@ -193,7 +193,9 @@ describe('generated EPUB artifacts', () => {
     const files = epub.getFiles();
 
     for (const name of ['cover.xhtml', 'toc.xhtml', 's1.xhtml']) {
-      const content = files.find((file) => file.name === name)?.content.toString();
+      const content = files
+        .find((file) => file.name === name)
+        ?.content.toString();
       expect(content).toContain('lang="en"');
       expect(content).toContain('xml:lang="en"');
     }
@@ -202,9 +204,7 @@ describe('generated EPUB artifacts', () => {
       .find(({ name }) => name === 'toc.xhtml')
       ?.content.toString();
     expect(contents).toMatch(/<section[^>]+epub:type="frontmatter"/);
-    expect(contents).toMatch(
-      /<nav[^>]+epub:type="toc"[^>]+role="doc-toc"/,
-    );
+    expect(contents).toMatch(/<nav[^>]+epub:type="toc"[^>]+role="doc-toc"/);
   });
 
   it('serializes caller-supplied accessibility metadata as separate escaped elements', () => {
@@ -223,14 +223,11 @@ describe('generated EPUB artifacts', () => {
     });
     const opf = epub
       .getFiles()
-      .find(({ name }) => name === 'ebook.opf')?.content.toString();
+      .find(({ name }) => name === 'ebook.opf')
+      ?.content.toString();
 
-    expect(opf).toContain(
-      '<meta property="schema:accessMode">textual</meta>',
-    );
-    expect(opf).toContain(
-      '<meta property="schema:accessMode">visual</meta>',
-    );
+    expect(opf).toContain('<meta property="schema:accessMode">textual</meta>');
+    expect(opf).toContain('<meta property="schema:accessMode">visual</meta>');
     expect(opf).toContain(
       '<meta property="schema:accessModeSufficient">textual</meta>',
     );
@@ -258,7 +255,8 @@ describe('generated EPUB artifacts', () => {
     });
     const opf = epub
       .getFiles()
-      .find(({ name }) => name === 'ebook.opf')?.content.toString();
+      .find(({ name }) => name === 'ebook.opf')
+      ?.content.toString();
 
     expect(opf).toContain('<dc:title id="title">Exact title</dc:title>');
     expect(opf).not.toContain('Exact title (Example series #2)');

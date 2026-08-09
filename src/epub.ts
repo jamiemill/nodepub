@@ -36,9 +36,7 @@ const normalizeSectionFilename = (filename: string, fallback: string) => {
     throw new Error(`Invalid section filename: "${source}"`);
   }
 
-  return source.toLowerCase().endsWith('.xhtml')
-    ? source
-    : `${source}.xhtml`;
+  return source.toLowerCase().endsWith('.xhtml') ? source : `${source}.xhtml`;
 };
 
 class Epub {
@@ -57,7 +55,10 @@ class Epub {
     );
 
     // Buffer being lost by defaults
-    if (typeof metadata.cover !== 'string' && typeof partialMetadata.cover !== 'string') {
+    if (
+      typeof metadata.cover !== 'string' &&
+      typeof partialMetadata.cover !== 'string'
+    ) {
       metadata.cover.data = partialMetadata.cover.data;
     }
 
@@ -211,8 +212,7 @@ class Epub {
             callback();
           }
         };
-        const rejectOnce = (error: Error) =>
-          settle(() => rejectWrite(error));
+        const rejectOnce = (error: Error) => settle(() => rejectWrite(error));
 
         archive.once('error', rejectOnce);
         output.once('error', rejectOnce);
@@ -233,7 +233,7 @@ class Epub {
           }
         });
 
-        void archive.finalize().catch(rejectOnce);
+        archive.finalize().catch(rejectOnce);
       });
     } catch (error) {
       archive.abort();

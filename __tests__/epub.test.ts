@@ -263,9 +263,8 @@ body { margin: 5px; }`,
   });
 
   it('zero-pads the default publication date', () => {
-    const { published: _published, ...metadataWithoutPublished } = metadata;
     const epub = new Epub({
-      metadata: metadataWithoutPublished,
+      metadata: { ...metadata, published: undefined },
       sections,
     });
 

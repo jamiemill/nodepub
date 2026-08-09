@@ -1,7 +1,7 @@
 {
   "author": "Dylan Armstrong <dylan@dylan.is>",
   "bugs": {
-    "url": "https://github.com/dylanarmstrong/nodepub/issues"
+    "url": "https://github.com/jamiemill/nodepub/issues"
   },
   "dependencies": {
     "archiver": "^6.0.1",
@@ -10,7 +10,7 @@
     "pug": "^3.0.2",
     "uuid": "^9.0.1"
   },
-  "description": "Create valid EPUB (v2) ebooks with metadata, contents and cover image.",
+  "description": "Create valid EPUB 3.3 ebooks with metadata, navigation, contents, covers, and resources.",
   "devDependencies": {
     "@daisy/ace": "1.4.6",
     "@dylanarmstrong/eslint-config": "^0.5.4",
@@ -45,13 +45,13 @@
     "./lib/",
     "./templates/"
   ],
-  "homepage": "https://github.com/dylanarmstrong/nodepub",
+  "homepage": "https://github.com/jamiemill/nodepub",
   "keywords": [
     "epub",
     "ebook"
   ],
   "license": "MIT",
-  "name": "@dylanarmstrong/nodepub",
+  "name": "@jamiemill/nodepub",
   "packageManager": "pnpm@8.15.9",
   "prettier": {
     "singleQuote": true,
@@ -60,20 +60,21 @@
   "private": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/dylanarmstrong/nodepub"
+    "url": "https://github.com/jamiemill/nodepub"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "node scripts/clean-lib.mjs && tsc",
     "example": "pnpm run build && pnpm run example:build && node --trace-uncaught example/example.js",
     "example:build": "tsc -p tsconfig.example.json",
     "lint": "pnpm run prettier && pnpm run lint:src && pnpm run lint:example && pnpm run lint:test",
     "lint:example": "eslint example/example.ts --fix",
     "lint:src": "eslint src/ --fix",
     "lint:test": "eslint __tests__/ --fix",
+    "prepare": "pnpm run build",
     "prettier": "prettier --write --ignore-unknown src/ __tests__/ example/example.ts",
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
     "validate": "pnpm run build && node scripts/validate-fixtures.mjs"
   },
   "type": "module",
-  "version": "4.1.5"
+  "version": "4.2.0"
 }

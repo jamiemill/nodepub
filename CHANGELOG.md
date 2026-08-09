@@ -1,24 +1,45 @@
 # CHANGE LOG
+
+## 2026-08-09 - v4.2.0
+
+- Generate an EPUB 3 navigation document for both contents-page option values.
+- Add `showContentsInSpine`; retain `showContents` as a deprecated compatibility alias.
+- Add `lang`, `xml:lang`, HTML5 doctypes, and `role="doc-toc"` to generated XHTML/navigation.
+- Add caller-controlled accessibility discovery metadata fields.
+- Reject resource archive-path collisions, unknown media types, and unsafe section filenames.
+- Accept section filename stems or complete `.xhtml` filenames.
+- Make archive and output errors reject `write()` and clean up partial files when possible.
+- Preserve the caller's exact title and zero-pad generated publication dates.
+- Pin artifact validation to EPUBCheck 5.3.0 and Ace 1.4.6 in CI.
+- Restore pnpm and externally packaged Pug templates by rebuilding on `@dylanarmstrong/nodepub` 4.1.5.
+- Restore a pnpm-based clean `prepare` build so Git dependencies contain compiled output without stale files.
+
 ## 2024-02-05 - v4.1.5
+
 - **FIX**: Fix resources not being buffers due to structuredClone
 
 ## 2024-02-05 - v4.1.4
+
 - Version updates
 - Better ESM support
 
 ## 2023-07-05 - v4.1.3
+
 - Move `@dylanarmstrong/tsconfig` to devDependencies
 
 ## 2023-07-04 - v4.1.2
+
 - Publish with types
 
 ## 2023-07-04 - v4.1.1
+
 - Allow overriding all `Resource` properties
 - Cast `defaults` to `Required<T>` instead of having messy type guards
   - This is hopefully temporary, pending this PR: https://github.com/sindresorhus/node-defaults/pull/6
 - Switch to shared tsconfig `@dylanarmstrong/tsconfig`
 
 ## 2023-07-04 - v4.1.0
+
 - Use `mime` for handling mime types, to support mp3 and such
 - Example converted to typescript
 - Pug files now prettified, so they can be read in an editor easier
@@ -29,12 +50,15 @@
 - **BREAKING**: `images` -> `resources` in constructor options
 
 ## 2023-07-03 - v4.0.2
+
 - **FIX**: Do not add duplicate images
 
 ## 2023-07-03 - v4.0.1
+
 - Publishing over unpublished broken v4.0.0 version
 
 ## 2023-07-03 - v4.0.0
+
 - Generates EPUB v3.3
 - Project converted to Typescript
 - Support non-image text covers
@@ -88,7 +112,7 @@
   - Contributors can use a free OSS license (I have a paid one, it's worth supporting)
 - Switched to `async`/`await` rather than callbacks
 - Updated documentation
-- Bumped version to update the documentation on *npm*
+- Bumped version to update the documentation on _npm_
 
 ## 2021-02-17
 
@@ -124,7 +148,7 @@
 - Updated dependencies
 - Restructured source folders
 - Switched from Jasmine tests to Mocha
-- Added *npm* scripts for running `eslint` and the example
+- Added _npm_ scripts for running `eslint` and the example
 
 Breaking changes:
 
