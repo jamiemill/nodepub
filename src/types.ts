@@ -1,4 +1,4 @@
-type CoverType = 'image' | 'text';
+type CoverType = 'image' | 'text' | 'none';
 
 type Section = {
   content: string;
@@ -24,7 +24,7 @@ type Resource = {
 
 type BaseMetadata = {
   author: string;
-  cover: string | Resource;
+  cover?: string | Resource;
   id: number | string;
   title: string;
 };
@@ -65,7 +65,7 @@ type ResolvedOptions = {
 };
 
 type Data = {
-  cover: string | Required<Resource>;
+  cover?: string | Required<Resource>;
   css: string;
   metadata: Required<Metadata>;
   options: ResolvedOptions;

@@ -1,21 +1,27 @@
 mixin resources(resources)
   each resource, i in resources
+    -
+      const isCoverImage = (resource.properties || '').split(/\s+/).includes('cover-image');
+      const itemId = isCoverImage ? 'cover-image' : `img${i}`;
     if resource.properties
       item(
         href=`resources/${resource.base}`,
-        id=`img${i}`,
+        id=itemId,
         media-type=resource.type
         properties=resource.properties
       )
     else
       item(
         href=`resources/${resource.base}`,
-        id=`img${i}`,
+        id=itemId,
         media-type=resource.type
       )
 
 -
   let showContentsInSpine = data.options.showContentsInSpine;
+  let coverType = data.options.coverType;
+  let hasCoverDocument = coverType === 'text';
+  let hasImageCover = coverType === 'image';
   let sections =data.sections;
 
 doctype xml
@@ -133,17 +139,19 @@ package(
         name='calibre:series_index'
       )
 
-    meta(
-      content='cover-image',
-      name='cover'
-    )
+    if hasImageCover
+      meta(
+        content='cover-image',
+        name='cover'
+      )
 
   manifest
-    item(
-      href='cover.xhtml',
-      id='cover',
-      media-type='application/xhtml+xml'
-    )
+    if hasCoverDocument
+      item(
+        href='cover.xhtml',
+        id='cover',
+        media-type='application/xhtml+xml'
+      )
 
     item(
       href='css/ebook.css',
@@ -168,10 +176,11 @@ package(
     +resources(data.resources)
 
   spine
-    itemref(
-      idref='cover',
-      linear='yes'
-    )
+    if hasCoverDocument
+      itemref(
+        idref='cover',
+        linear='yes'
+      )
 
     each section in sections
       if section.isFrontMatter
@@ -190,10 +199,17 @@ package(
           idref=`s${section.index}`
         )
 
-  if showContentsInSpine
+  if hasCoverDocument || showContentsInSpine
     guide
-      reference(
-        href='content/toc.xhtml',
-        title='Contents',
-        type='toc'
-      )
+      if hasCoverDocument
+        reference(
+          href='cover.xhtml',
+          title='Cover',
+          type='cover'
+        )
+      if showContentsInSpine
+        reference(
+          href='content/toc.xhtml',
+          title='Contents',
+          type='toc'
+        )

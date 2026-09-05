@@ -80,5 +80,5 @@
     "validate": "pnpm run build && node scripts/validate-fixtures.mjs"
   },
   "type": "module",
-  "version": "4.2.0"
+  "version": "4.3.0"
 }

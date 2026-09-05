@@ -39,6 +39,10 @@ const getCover = (data: Data) => {
   const { coverType } = data.options;
   const { cover } = data;
 
+  if (coverType !== 'text') {
+    throw new Error('Cover documents are only generated for text covers');
+  }
+
   if (coverType === 'text' && typeof cover === 'string') {
     const coverText = processTextContent(cover);
     return pugCover({ coverText, data });

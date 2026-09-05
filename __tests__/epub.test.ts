@@ -196,12 +196,6 @@ body { margin: 5px; }`,
       {
         compress: true,
         content: expect.any(String),
-        folder: 'OPS',
-        name: 'cover.xhtml',
-      },
-      {
-        compress: true,
-        content: expect.any(String),
         folder: 'OPS/css',
         name: 'ebook.css',
       },
@@ -244,6 +238,49 @@ body { margin: 5px; }`,
     ]);
   });
 
+  it('omits the cover document when no cover is provided', () => {
+    const { cover: _cover, ...metadataWithoutCover } = metadata;
+    const epub = new Epub({
+      metadata: metadataWithoutCover,
+      sections,
+    });
+
+    expect(epub.data.options.coverType).toBe('none');
+    expect(epub.data.cover).toBeUndefined();
+    const files = epub.getFiles();
+    expect(files.some(({ name }) => name === 'cover.xhtml')).toBe(false);
+    expect(files.some(({ name }) => name === 'cover.png')).toBe(false);
+
+    const opf = files
+      .find(({ name }) => name === 'ebook.opf')
+      ?.content.toString();
+    expect(opf).not.toContain('cover.xhtml');
+    expect(opf).not.toContain('properties="cover-image"');
+    expect(opf).not.toContain('name="cover"');
+    expect(opf).not.toMatch(/<itemref[^>]+idref="cover"/);
+  });
+
+  it('identifies an image cover in the package without a reading-order page', () => {
+    const epub = new Epub({
+      css,
+      metadata,
+      resources,
+      sections,
+    });
+    const files = epub.getFiles();
+    const opf = files
+      .find(({ name }) => name === 'ebook.opf')
+      ?.content.toString();
+
+    expect(files.some(({ name }) => name === 'cover.xhtml')).toBe(false);
+    expect(opf).toContain('id="cover-image"');
+    expect(opf).toContain('properties="cover-image"');
+    expect(opf).toContain('name="cover"');
+    expect(opf).toContain('content="cover-image"');
+    expect(opf).not.toContain('cover.xhtml');
+    expect(opf).not.toMatch(/<itemref[^>]+idref="cover"/);
+  });
+
   it('Handles text cover correctly', () => {
     const epub = new Epub({
       css,
@@ -262,25 +299,22 @@ body { margin: 5px; }`,
     expect(
       files.filter(({ folder }) => folder === 'OPS/resources').length,
     ).toBe(1);
+    const opf = files
+      .find(({ name }) => name === 'ebook.opf')
+      ?.content.toString();
+    expect(opf).toMatch(/<itemref[^>]+idref="cover"[^>]+linear="yes"/);
+    expect(opf).not.toContain('properties="cover-image"');
   });
 
-  it('supports default, explicit, and decorative cover alternative text', () => {
-    const getCover = (coverAlt?: string) => {
-      const epub = new Epub({
-        metadata: { ...metadata, coverAlt },
-        sections,
-      });
-      return epub
-        .getFiles()
-        .find(({ name }) => name === 'cover.xhtml')
-        ?.content.toString();
-    };
-
-    expect(getCover()).toContain('alt="Cover of My First Book"');
-    expect(getCover('Front cover artwork')).toContain(
-      'alt="Front cover artwork"',
-    );
-    expect(getCover('')).toContain('alt=""');
+  it('rejects an image coverType without a cover resource', () => {
+    expect(
+      () =>
+        new Epub({
+          metadata: { ...metadata, cover: undefined },
+          options: { coverType: 'image' },
+          sections,
+        }),
+    ).toThrow(/image covers require metadata\.cover/i);
   });
 
   it('keeps front matter and excluded entries out of logical navigation', () => {
@@ -299,7 +333,7 @@ body { margin: 5px; }`,
     const epub = new Epub({ metadata, sections });
     const files = epub.getFiles();
 
-    for (const name of ['cover.xhtml', 'toc.xhtml', 'title-page.xhtml']) {
+    for (const name of ['toc.xhtml', 'title-page.xhtml']) {
       const content = files
         .find((file) => file.name === name)
         ?.content.toString();

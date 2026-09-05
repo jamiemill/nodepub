@@ -135,8 +135,9 @@ describe('generated EPUB artifacts', () => {
 
     expect(byName.get('OPS/resources/cover.png')?.content).toEqual(cover);
     expect(byName.get('OPS/resources/body.png')?.content).toEqual(bodyImage);
-    expect(byName.get('OPS/cover.xhtml')?.content.toString()).toContain(
-      'alt="Cover of Example &amp; Book"',
+    expect(byName.has('OPS/cover.xhtml')).toBe(false);
+    expect(byName.get('OPS/ebook.opf')?.content.toString()).toContain(
+      'properties="cover-image"',
     );
     expect(byName.get('OPS/ebook.opf')?.content.toString()).toContain(
       'media-type="image/png"',

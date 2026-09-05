@@ -28,22 +28,28 @@ html(
           padding: 0pt;
           margin: 0pt;
         }
+        html, body {
+          margin: 0;
+          padding: 0;
+          height: 100%;
+        }
         body {
-          display: flex;
-          justify-content: center;
-          align-items: center;
+          text-align: center;
         }
         body img {
           max-width: 100%;
           max-height: 100%;
+          width: auto;
+          height: auto;
         }
 
-  body
+  body(
+    epub:type='cover'
+  )
     if coverType === 'image'
       img(
         alt=data.metadata.coverAlt,
-        src=`resources/${data.cover.base}`,
-        style='height: 100%; width: 100%;'
+        src=`resources/${data.cover.base}`
       )
     else if coverText
       div!= coverText

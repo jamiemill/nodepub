@@ -4,7 +4,14 @@ import { createWriteStream } from 'node:fs';
 import { unlink } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import type { Data, Document, Metadata, Section } from './types.js';
+import type {
+  CoverType,
+  Data,
+  Document,
+  Metadata,
+  Resource,
+  Section,
+} from './types.js';
 import {
   defaultCss,
   defaultMetadata,
@@ -39,6 +46,37 @@ const normalizeSectionFilename = (filename: string, fallback: string) => {
   return source.toLowerCase().endsWith('.xhtml') ? source : `${source}.xhtml`;
 };
 
+const resolveCoverType = (
+  explicit: CoverType | undefined,
+  cover: Metadata['cover'],
+): CoverType => {
+  if (explicit) return explicit;
+  if (cover && typeof cover !== 'string') return 'image';
+  if (typeof cover === 'string' && cover.length > 0) return 'text';
+  return 'none';
+};
+
+const resolveCover = (
+  coverType: CoverType,
+  cover: Metadata['cover'],
+): string | Required<Resource> | undefined => {
+  if (coverType === 'none') return undefined;
+  if (coverType === 'text') {
+    if (typeof cover !== 'string' || cover.length === 0) {
+      throw new Error(
+        'Text covers require metadata.cover to be a non-empty XHTML string',
+      );
+    }
+    return cover;
+  }
+  if (!cover || typeof cover === 'string') {
+    throw new Error(
+      'Image covers require metadata.cover to be a { data, name } resource',
+    );
+  }
+  return addResourceDetails({ ...cover, properties: 'cover-image' });
+};
+
 class Epub {
   data: Data;
 
@@ -54,19 +92,31 @@ class Epub {
       defaultMetadata,
     );
 
-    // Buffer being lost by defaults
+    const coverType = resolveCoverType(
+      partialOptions.coverType,
+      partialMetadata.cover,
+    );
+    const dataCover = resolveCover(coverType, partialMetadata.cover);
     if (
-      typeof metadata.cover !== 'string' &&
+      dataCover &&
+      typeof dataCover !== 'string' &&
+      partialMetadata.cover &&
       typeof partialMetadata.cover !== 'string'
     ) {
-      metadata.cover.data = partialMetadata.cover.data;
+      // Buffer being lost by defaults
+      metadata.cover = {
+        ...partialMetadata.cover,
+        data: partialMetadata.cover.data,
+      };
     }
-    metadata.coverAlt =
-      partialMetadata.coverAlt ??
-      (metadata.title ? `Cover of ${metadata.title}` : 'Cover');
+    if (coverType === 'image') {
+      metadata.coverAlt =
+        partialMetadata.coverAlt ??
+        (metadata.title ? `Cover of ${metadata.title}` : 'Cover');
+    }
 
     const options = {
-      coverType: partialOptions.coverType ?? defaultOptions.coverType,
+      coverType,
       showContentsInSpine:
         partialOptions.showContentsInSpine ??
         partialOptions.showContents ??
@@ -92,15 +142,9 @@ class Epub {
       sections.push(requiredSection);
     });
 
-    const { cover } = metadata;
-
     const css = [defaultCss, overrideCss].join('\n');
 
-    const dataCover =
-      typeof cover === 'string'
-        ? cover
-        : addResourceDetails({ ...cover, properties: 'cover-image' });
-    const initialResources = typeof dataCover === 'string' ? [] : [dataCover];
+    const initialResources = dataCover && typeof dataCover !== 'string' ? [dataCover] : [];
     const detailedResources = resources
       .reduce(uniqueResources, initialResources)
       .map(addResourceDetails);
@@ -145,12 +189,16 @@ class Epub {
       name: 'ebook.opf',
     });
 
-    files.push({
-      compress: true,
-      content: getCover(data),
-      folder: 'OPS',
-      name: 'cover.xhtml',
-    });
+    // Image covers live in the package as cover-image. Only text covers need
+    // a document in the reading order.
+    if (data.options.coverType === 'text') {
+      files.push({
+        compress: true,
+        content: getCover(data),
+        folder: 'OPS',
+        name: 'cover.xhtml',
+      });
+    }
 
     // Optional files.
     files.push({

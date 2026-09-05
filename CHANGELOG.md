@@ -1,5 +1,13 @@
 # CHANGE LOG
 
+## 2026-09-05 - v4.3.0
+
+- Make covers optional (`coverType: 'none'`). An omitted cover no longer emits `cover.xhtml` or cover metadata.
+- Infer `coverType` from `metadata.cover` when the option is omitted: image resource → `image`, XHTML string → `text`, missing → `none`.
+- Treat image covers as package metadata only: emit `properties="cover-image"` and the EPUB 2 `meta name="cover"`, but do not add `cover.xhtml` to the reading order.
+- Give the cover image a stable manifest id of `cover-image` so the EPUB 2 `meta name="cover"` points at a real item.
+- Keep text covers as a linear `cover.xhtml` document.
+
 ## 2026-08-09 - v4.2.0
 
 - Generate an EPUB 3 navigation document for both contents-page option values.

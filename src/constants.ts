@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid';
 import type { Metadata, ResolvedOptions, Section } from './types.js';
 
 const defaultOptions: ResolvedOptions = {
-  coverType: 'image',
+  coverType: 'none',
   showContentsInSpine: true,
 };
 

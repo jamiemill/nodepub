@@ -28,7 +28,7 @@ Nodepub is a **Node** module which can be used to create **Epub 3** documents.
 
 - Generated fixtures pass EPUBCheck 5.3.0 and Ace by DAISY 1.4.6 in CI
 - Files open fine in iBooks and Calibre
-- PNG/JPEG cover images (or text)
+- Optional PNG/JPEG cover images, text covers, or no cover
 - Inline resources within the Epub
   - See [Including Resources](#including-resources) for supported formats
 - Custom CSS can be provided
@@ -148,8 +148,8 @@ const epub = new Epub({
 
 ### Regarding Metadata
 
-- `cover` is either an image `Resource` or prevalidated XHTML content for a text cover
-- `coverAlt` sets image-cover alternative text; use `''` only when the cover is intentionally decorative
+- `cover` is optional. An image `Resource` is declared as the package `cover-image` and is not placed in the reading order. An XHTML string becomes a linear text cover. Omitting it produces no cover.
+- `coverAlt` is retained for callers; image covers no longer emit a cover HTML page, so the value is not serialized into a document
 - `fileAs` is the sortable version of the `author`, which is usually by last name
 - `genre` becomes the main subject in the final Epub
 - `language` is the short _ISO_ language name (`en`, `fr`, `de` etc)
@@ -172,9 +172,8 @@ responsible for ensuring that every claim is true for the complete publication.
 An Ace pass is not a certification, and nodepub never emits conformance or
 certification claims automatically.
 
-When an image cover omits `coverAlt`, nodepub uses `Cover of {title}` as a
-backward-compatible fallback. Callers should normally provide a more useful
-value. `coverAlt` is XML-escaped during serialization.
+`coverAlt` is kept on the metadata object for callers. Image covers are not
+emitted as an HTML page, so the value is not written into the package.
 
 ### Regarding Sections
 
@@ -239,7 +238,7 @@ You can also modify the book with advanced options.
 | ------------------- | ------------------------------------------ | ------- |
 | showContentsInSpine | Include the contents page in reading order | `true`  |
 | showContents        | Deprecated alias for `showContentsInSpine` |         |
-| coverType           | Is the cover `image` or `text`?            | `image` |
+| coverType           | `image`, `text`, or `none`                 | inferred |
 
 EPUB 3 always requires a navigation document. Both option values therefore
 generate and manifest `toc.xhtml`; the option controls only whether it appears
@@ -248,7 +247,7 @@ as a visible reading-order page.
 ```javascript
 const options = {
   showContentsInSpine: true,
-  coverType: 'image', // Possible types are 'image' and 'text'  (default: 'image')
+  coverType: 'image', // Possible types are 'image', 'text', and 'none'
 };
 
 const epub = new Epub({
