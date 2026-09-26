@@ -117,6 +117,9 @@ class Epub {
 
     const options = {
       coverType,
+      pageProgressionDirection:
+        partialOptions.pageProgressionDirection ??
+        defaultOptions.pageProgressionDirection,
       showContentsInSpine:
         partialOptions.showContentsInSpine ??
         partialOptions.showContents ??
@@ -144,7 +147,8 @@ class Epub {
 
     const css = [defaultCss, overrideCss].join('\n');
 
-    const initialResources = dataCover && typeof dataCover !== 'string' ? [dataCover] : [];
+    const initialResources =
+      dataCover && typeof dataCover !== 'string' ? [dataCover] : [];
     const detailedResources = resources
       .reduce(uniqueResources, initialResources)
       .map(addResourceDetails);

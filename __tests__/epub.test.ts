@@ -116,6 +116,7 @@ body { margin: 5px; }`,
       },
       options: {
         coverType: 'image',
+        pageProgressionDirection: 'default',
         showContentsInSpine: true,
       },
       resources: [
@@ -258,6 +259,21 @@ body { margin: 5px; }`,
     expect(opf).not.toContain('properties="cover-image"');
     expect(opf).not.toContain('name="cover"');
     expect(opf).not.toMatch(/<itemref[^>]+idref="cover"/);
+  });
+
+  it('sets the EPUB spine page progression direction', () => {
+    const epub = new Epub({
+      metadata: { ...metadata, language: 'ja' },
+      options: { pageProgressionDirection: 'rtl' },
+      sections,
+    });
+
+    expect(epub.data.options.pageProgressionDirection).toBe('rtl');
+    const opf = epub
+      .getFiles()
+      .find(({ name }) => name === 'ebook.opf')
+      ?.content.toString();
+    expect(opf).toContain('<spine page-progression-direction="rtl">');
   });
 
   it('identifies an image cover in the package without a reading-order page', () => {

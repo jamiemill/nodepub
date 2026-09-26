@@ -4,6 +4,7 @@ import type { Metadata, ResolvedOptions, Section } from './types.js';
 
 const defaultOptions: ResolvedOptions = {
   coverType: 'none',
+  pageProgressionDirection: 'default',
   showContentsInSpine: true,
 };
 

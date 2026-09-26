@@ -175,7 +175,9 @@ package(
 
     +resources(data.resources)
 
-  spine
+  spine(
+    page-progression-direction=data.options.pageProgressionDirection
+  )
     if hasCoverDocument
       itemref(
         idref='cover',

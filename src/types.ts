@@ -54,6 +54,7 @@ type Metadata = BaseMetadata &
 
 type Options = Partial<{
   coverType: CoverType;
+  pageProgressionDirection: 'default' | 'ltr' | 'rtl';
   /** @deprecated Use showContentsInSpine instead. */
   showContents: boolean;
   showContentsInSpine: boolean;
@@ -61,6 +62,7 @@ type Options = Partial<{
 
 type ResolvedOptions = {
   coverType: CoverType;
+  pageProgressionDirection: 'default' | 'ltr' | 'rtl';
   showContentsInSpine: boolean;
 };
 
