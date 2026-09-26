@@ -240,7 +240,7 @@ body { margin: 5px; }`,
   });
 
   it('omits the cover document when no cover is provided', () => {
-    const { cover: _cover, ...metadataWithoutCover } = metadata;
+    const { cover: _, ...metadataWithoutCover } = metadata;
     const epub = new Epub({
       metadata: metadataWithoutCover,
       sections,
